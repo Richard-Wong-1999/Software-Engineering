@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Order</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+        }
+
+        .nav-bar {
+            background-color: #2c3e50;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 10px 25px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            background-color: #34495e;
+        }
+
+        .nav-link:hover {
+            background-color: #3498db;
+        }
+
+        .nav-link.active {
+            background-color: #3498db;
+            font-weight: 500;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .order-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            background-color: white;
+        }
+
+        .order-card:hover {
+            background-color: #f5f5f5;
+        }
+
+        .order-info {
+            margin-bottom: 10px;
+        }
+
+        .order-items {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .nav-items {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .nav-link {
+                text-align: center;
+                display: block;
+            }
+
+            .content {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-items">
+            <a href="/menu" class="nav-link">Menu Management</a>
+            <a href="/orders" class="nav-link">Order Modification</a>
+            <a href="/payment" class="nav-link">Payment System</a>
+            <a href="/history" class="nav-link">Historical Orders</a>
+            <a href="/logout" class="nav-link">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Select Order to Edit</h1>
+
+        <% orders.forEach(order => { %>
+            <a href="/edit-order/<%= order._id %>" style="text-decoration: none; color: inherit;">
+                <div class="order-card">
+                    <div class="order-info">
+                        <strong>Order ID:</strong> #<%= order._id.toString().slice(-6) %><br>
+                        <strong>Seat:</strong> <%= order.seat %><br>
+                        <strong>People:</strong> <%= order.numberOfPeople %><br>
+                        <strong>Time:</strong> <%= new Date(order.time).toLocaleString() %><br>
+                        <strong>Payment Status:</strong> <%= order.paymentStatus %>
+                    </div>
+                    <div class="order-items">
+                        <strong>Items:</strong>
+                        <%= order.items.map(item => `${item.name} (${item.quantity})`).join(', ') %>
+                    </div>
+                </div>
+            </a>
+        <% }); %>
+
+        <% if (orders.length === 0) { %>
+            <p>No orders available.</p>
+        <% } %>
+    </div>
+
+    <script>
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

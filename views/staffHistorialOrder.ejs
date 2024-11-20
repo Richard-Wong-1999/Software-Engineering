@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order History</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    	* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin: 0;
+        }
+
+        .filters {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .orders-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .order-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .order-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: bold;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .items-table th {
+            background-color: #f8f8f8;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+
+        .payment-unpaid {
+            background-color: #ffe5e5;
+            color: #d63031;
+        }
+
+        .payment-paid {
+            background-color: #e5ffe5;
+            color: #27ae60;
+        }
+
+        .status-preparing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-delivering {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .total-price {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .order-info {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .items-table {
+                font-size: 0.9em;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+        }
+        .nav-bar {
+            background-color: #2c3e50;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 10px 25px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            background-color: #34495e;
+        }
+
+        .nav-link:hover {
+            background-color: #3498db;
+        }
+
+        .nav-link.active {
+            background-color: #3498db;
+            font-weight: 500;
+        }
+
+        @media (max-width: 600px) {
+            .nav-items {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .nav-link {
+                text-align: center;
+                display: block;
+            }
+        }
+        
+        .content{
+            width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-items">
+            <a href="/menu" class="nav-link">Menu Management</a>
+            <a href="/orders" class="nav-link">Order Modification</a>
+            <a href="/payment" class="nav-link">Payment System</a>
+            <a href="/history" class="nav-link">Historical Orders</a>
+            <a href="/logout" class="nav-link">Sign Out</a>
+        </div>
+    </nav>
+
+    <script>
+        // 處理當前頁面的活動狀態
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+    <div class="content">
+    <div class="header">
+        <h1>Order History</h1>
+    </div>
+
+    <div class="filters">
+        <div class="filter-group">
+            <label>Date Range:</label>
+            <input type="date" id="startDate">
+            <span>to</span>
+            <input type="date" id="endDate">
+        </div>
+        <div class="filter-group">
+            <label>Payment Status:</label>
+            <select id="paymentStatus">
+                <option value="all">All</option>
+                <option value="paid">Paid</option>
+                <option value="unpaid">Unpaid</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="orders-container">
+        <% orders.sort((a, b) => b.time - a.time).forEach(order => { %>
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <strong>Order Time:</strong> 
+                        <%= new Date(order.time).toLocaleString() %>
+                    </div>
+                    <span class="status-badge payment-<%= order.paymentStatus %>">
+                        <%= order.paymentStatus.toUpperCase() %>
+                    </span>
+                </div>
+
+                <div class="order-info">
+                    <div class="info-item">
+                        <div class="info-label">Seat</div>
+                        <div class="info-value"><%= order.seat %></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Number of People</div>
+                        <div class="info-value"><%= order.numberOfPeople %></div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Items Count</div>
+                        <div class="info-value"><%= order.items.length %></div>
+                    </div>
+                </div>
+
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% let totalPrice = 0; %>
+                        <% order.items.forEach(item => { %>
+                            <% totalPrice += item.price * item.quantity; %>
+                            <tr>
+                                <td><%= item.name %></td>
+                                <td><%= item.quantity %></td>
+                                <td>$<%= item.price.toFixed(2) %></td>
+                                <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                                <td>
+                                    <span class="status-badge status-<%= item.status %>">
+                                        <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+
+                <div class="total-price">
+                    Total Price: $<%= totalPrice.toFixed(2) %>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+    </div>
+    <script>
+        // 日期過濾功能
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const paymentStatusSelect = document.getElementById('paymentStatus');
+        const orderCards = document.querySelectorAll('.order-card');
+
+        function filterOrders() {
+            const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+            const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+            const paymentStatus = paymentStatusSelect.value;
+
+            orderCards.forEach(card => {
+                const orderDate = new Date(card.querySelector('.order-header').textContent.split('Order Time:')[1].trim());
+                const cardPaymentStatus = card.querySelector('.payment-paid, .payment-unpaid').textContent.toLowerCase();
+
+                let showCard = true;
+
+                if (startDate && orderDate < startDate) showCard = false;
+                if (endDate && orderDate > endDate) showCard = false;
+                if (paymentStatus !== 'all' && cardPaymentStatus !== paymentStatus) showCard = false;
+
+                card.style.display = showCard ? 'block' : 'none';
+            });
+        }
+
+        startDateInput.addEventListener('change', filterOrders);
+        endDateInput.addEventListener('change', filterOrders);
+        paymentStatusSelect.addEventListener('change', filterOrders);
+    </script>
+</body>
+</html>

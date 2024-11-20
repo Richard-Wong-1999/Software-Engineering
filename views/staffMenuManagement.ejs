@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+        }
+
+        .nav-bar {
+            background-color: #2c3e50;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 5px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            padding: 10px 25px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            background-color: #34495e;
+        }
+
+        .nav-link:hover {
+            background-color: #3498db;
+        }
+
+        .nav-link.active {
+            background-color: #3498db;
+            font-weight: 500;
+        }
+
+        .content-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            background-color: white;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .menu-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .menu-controls {
+            margin-left: auto;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-edit {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: #45a049;
+        }
+
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #da190b;
+        }
+
+        .add-form {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px;
+            margin: 5px;
+            width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .menu-info {
+            display: flex;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .nav-items {
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+
+            .nav-link {
+                text-align: center;
+                display: block;
+            }
+
+            .menu-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .menu-controls {
+                margin: 10px 0;
+            }
+
+            input[type="text"],
+            input[type="number"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-items">
+            <a href="/menu" class="nav-link active">Menu Management</a>
+            <a href="/orders" class="nav-link">Order Modification</a>
+            <a href="/payment" class="nav-link">Payment System</a>
+            <a href="/history" class="nav-link">Order History</a>
+            <a href="/logout" class="nav-link">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="content-container">
+        <h1>Menu Management</h1>
+
+        <div class="add-form">
+            <h2>Add New Item</h2>
+            <form action="/menuManagement/add" method="POST">
+                <input type="text" name="name" placeholder="Item name" required>
+                <input type="number" name="price" placeholder="Price" required>
+                <button type="submit" class="btn btn-edit">Add</button>
+            </form>
+        </div>
+
+        <div class="menu-list">
+            <h2>Current Menu</h2>
+            <% if (menuItems && menuItems.length > 0) { %>
+                <% menuItems.forEach(item => { %>
+                    <div class="menu-item" id="item-<%= item._id %>">
+                        <div class="menu-info">
+                            <span><%= item.name %></span>
+                            <span>$<%= item.price %></span>
+                        </div>
+                        <div class="menu-controls">
+                            <button class="btn btn-edit" onclick="showEditForm('<%= item._id %>', '<%= item.name %>', <%= item.price %>)">
+                                Edit
+                            </button>
+                            <form action="/menuManagement/delete/<%= item._id %>" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="edit-form-<%= item._id %>" style="display: none;">
+                        <form action="/menuManagement/edit/<%= item._id %>" method="POST" class="menu-item">
+                            <input type="text" name="name" value="<%= item.name %>" required>
+                            <input type="number" name="price" value="<%= item.price %>" required>
+                            <button type="submit" class="btn btn-edit">Save</button>
+                            <button type="button" class="btn" onclick="hideEditForm('<%= item._id %>')">Cancel</button>
+                        </form>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No menu items available</p>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        function showEditForm(itemId, name, price) {
+            document.getElementById(`item-${itemId}`).style.display = 'none';
+            document.getElementById(`edit-form-${itemId}`).style.display = 'block';
+        }
+
+        function hideEditForm(itemId) {
+            document.getElementById(`item-${itemId}`).style.display = 'flex';
+            document.getElementById(`edit-form-${itemId}`).style.display = 'none';
+        }
+
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

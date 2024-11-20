@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Successful</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .success-container {
+            background-color: white;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .checkmark {
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            transform-origin: center;
+            animation: checkmark 0.5s ease-out 0.5s both;
+        }
+
+        @keyframes checkmark {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .success-title {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 16px;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #7f8c8d;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .order-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            text-align: left;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .back-home {
+            display: inline-block;
+            padding: 12px 32px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+        }
+
+        .back-home:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76,175,80,0.4);
+        }
+
+        .back-home:active {
+            transform: translateY(0);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -20px;
+            animation: confettiFall linear infinite;
+            opacity: 0;
+            z-index: 0;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-20px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .success-container {
+                padding: 24px;
+                width: 95%;
+            }
+
+            .success-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .checkmark {
+                font-size: 30px;
+            }
+
+            .success-title {
+                font-size: 20px;
+            }
+
+            .success-message {
+                font-size: 14px;
+            }
+
+            .detail-item {
+                font-size: 14px;
+            }
+
+            .back-home {
+                padding: 10px 24px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <span class="checkmark">✓</span>
+        </div>
+        
+        <h1 class="success-title">Payment Successful!</h1>
+        
+        <p class="success-message">
+            Thank you for your order. Your payment has been processed successfully.
+        </p>
+
+        <div class="order-details">
+            <div class="detail-item">
+                <span class="detail-label">Order Time:</span>
+                <span><%= new Date(order.time).toLocaleString() %></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Seat Number:</span>
+                <span><%= order.seat %></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Number of People:</span>
+                <span><%= order.numberOfPeople %></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Total Amount:</span>
+                <span>$<%= order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2) %></span>
+            </div>
+        </div>
+
+        <a href="/" class="back-home">Back to Home</a>
+    </div>
+
+    <script>
+        function getRandomColor() {
+            const colors = [
+                '#ff718d', // 粉紅
+                '#64b5f6', // 淺藍
+                '#81c784', // 淺綠
+                '#ffd54f', // 淺黃
+                '#ba68c8', // 淺紫
+                '#ff8a65'  // 珊瑚色
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    
+                    // 隨機水平位置
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    
+                    // 隨機顏色
+                    confetti.style.backgroundColor = getRandomColor();
+                    
+                    // 隨機大小
+                    const size = Math.random() * 8 + 6; // 6px 到 14px
+                    confetti.style.width = size + 'px';
+                    confetti.style.height = size + 'px';
+                    
+                    // 隨機形狀 (圓形或方形)
+                    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    
+                    // 隨機動畫時長
+                    const duration = Math.random() * 2 + 3; // 3-5秒
+                    confetti.style.animation = `confettiFall ${duration}s linear infinite`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // 清理
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, duration * 1000);
+                }, Math.random() * 500); // 在0.5秒內隨機時間創建
+            }
+        }
+
+        // 頁面加載時開始效果
+        window.onload = () => {
+            createConfetti();
+            // 每2.5秒創建一批新的紙碎
+            setInterval(createConfetti, 2500);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Order Information</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .order-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .order-header {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .order-header h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .basic-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .items-table th, 
+        .items-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .items-table th {
+            background-color: #f8f8f8;
+            color: #666;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+
+        .status-preparing {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-delivering {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .total-price {
+            text-align: right;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .continue-btn {
+            display: inline-block; /* 改為 inline-block */
+            width: auto; /* 改為 auto */
+            min-width: 200px; /* 設置最小寬度 */
+            padding: 12px 30px; /* 調整內邊距 */
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 6px; /* 稍微調小圓角 */
+            font-size: 1em; /* 調小字體 */
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 0 auto; /* 用於置中 */
+        }
+
+        .button-container {
+            text-align: center; /* 使按鈕置中 */
+            margin-top: 20px;
+        }
+
+        .continue-btn:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 600px) {
+            .items-table {
+                font-size: 0.9em;
+            }
+
+            .items-table th, 
+            .items-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="order-card">
+        <div class="order-header">
+            <h2>Order Information</h2>
+            <div class="order-id">Order ID: <%= order._id %></div>
+        </div>
+
+        <div class="basic-info">
+            <div class="info-item">
+                <div class="info-label">Seat</div>
+                <div class="info-value"><%= order.seat %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Number of People</div>
+                <div class="info-value"><%= order.numberOfPeople %></div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Order Time</div>
+                <div class="info-value"><%= new Date(order.time).toLocaleString() %></div>
+            </div>
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% let totalPrice = 0; %>
+                <% order.items.forEach(item => { %>
+                    <tr>
+                        <td><%= item.name %></td>
+                        <td><%= item.quantity %></td>
+                        <td>$<%= item.price.toFixed(2) %></td>
+                        <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                        <td>
+                            <span class="status-badge status-<%= item.status %>">
+                                <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                            </span>
+                        </td>
+                    </tr>
+                    <% totalPrice += item.price * item.quantity; %>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <div class="total-price">
+            Total Price: $<%= totalPrice.toFixed(2) %>
+        </div>
+        <div class="button-container">
+    <a href="/customerOrder?orderId=<%= order._id %>" class="continue-btn">Continue to Order</a>
+        </div>
+    </div>
+
+</body>
+</html>

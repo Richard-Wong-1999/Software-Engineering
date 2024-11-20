@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-image: url('/food.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            animation: fadeIn 1s ease-in-out; /* Add fade-in animation */
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-bottom: 16px;
+            transition: border-color 0.3s ease; /* Smooth border color change */
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: #4CAF50; /* Change border color on focus */
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease; /* Smooth background color change */
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        @keyframes fadeIn { /* Define the fadeIn animation */
+            from {
+                opacity: 0;
+                transform: translateY(-20px); /* Start slightly above */
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                width: 90%;
+            }
+        }
+        
+        .staff-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .staff-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .staff-link a:hover {
+            color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome</h1>
+        <form id="bookingForm">
+            <label for="seat">Select Seat:</label>
+            <select id="seat" name="seat">
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="A3">A3</option>
+                <option value="B1">B1</option>
+                <option value="B2">B2</option>
+                <option value="B3">B3</option>
+                <option value="C1">C1</option>
+                <option value="C2">C2</option>
+                <option value="C3">C3</option>
+            </select>
+
+            <label for="people">Number of People:</label>
+            <input type="number" id="people" name="people" min="1" max="10" value="1">
+
+            <input type="submit" value="Submit">
+        </form>
+        <div class="staff-link">
+            <a href="/staffLogin">Staff Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('bookingForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const seat = document.getElementById('seat').value;
+            const numberOfPeople = document.getElementById('people').value;
+
+            try {
+                const response = await fetch('/createOrder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        seat,
+                        numberOfPeople
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create order');
+                }
+
+                const data = await response.json();
+                // 重定向到點餐頁面，並帶上訂單ID
+                window.location.href = `/customerOrder?orderId=${data.orderId}`;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to create order. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
