@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Menu = require('./models/menu');
 const Order = require('./models/order');
 const Staff = require('./models/staff');
+const staffAuthRoutes = require('./routes/staffAuth');
 const app = express();
 
 // 引入路由
@@ -20,6 +21,7 @@ mongoose.connect(uri)
 // 設置中間件
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // 設置 EJS 模板引擎
 app.set('view engine', 'ejs');
@@ -204,6 +206,7 @@ app.get('/staffPaymentSystem', (req, res) => {
 // 使用路由模組
 app.use('/staffRegister', staffRegistrationRoutes);
 app.use('/menuManagement', menuManagementRoutes);
+app.use('/staff', staffAuthRoutes);
 
 // 端口處理
 const normalizePort = (val) => {

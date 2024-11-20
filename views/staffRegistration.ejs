@@ -149,45 +149,57 @@
     </div>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const referee = document.getElementById('referee').value;
-            const errorMessage = document.getElementById('error-message');
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const referee = document.getElementById('referee').value;
+        const errorMessage = document.getElementById('error-message');
 
-            // Basic validation
-            if (!username || !password || !confirmPassword || !referee) {
+        // Basic validation
+        if (!username || !password || !confirmPassword || !referee) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = "All fields are required.";
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = "Passwords do not match.";
+            return;
+        }
+
+        if (password.length < 6) {
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = "Password must be at least 6 characters long.";
+            return;
+        }
+
+        fetch('/staff/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, password, referee })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = data.redirectUrl;
+            } else {
                 errorMessage.style.display = 'block';
-                errorMessage.textContent = "All fields are required.";
-                return;
+                errorMessage.textContent = data.message;
             }
-
-            if (password !== confirmPassword) {
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = "Passwords do not match.";
-                return;
-            }
-
-            if (password.length < 6) {
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = "Password must be at least 6 characters long.";
-                return;
-            }
-
-            // Check referee code
-            if (referee !== 's1234') {
-                errorMessage.style.display = 'block';
-                errorMessage.textContent = "Invalid referee code.";
-                return;
-            }
-
-            // If all validations pass, submit the form
-            this.submit();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'An error occurred. Please try again.';
         });
-    </script>
+    });
+</script>
 
 </body>
 </html>
