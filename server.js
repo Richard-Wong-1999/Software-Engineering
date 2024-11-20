@@ -179,8 +179,18 @@ app.get('/staffChooseOrderForPayment', (req, res) => {
     res.render('staffChooseOrderForPayment');
 });
 
-app.get('/staffHistorialOrder', (req, res) => {
-    res.render('staffHistorialOrder');
+app.get('/staffHistorialOrder', async (req, res) => {
+    try {
+        // Fetch all orders from the database
+        const orders = await Order.find({})
+            .sort({ time: -1 }); // Sort by time in descending order
+        
+        // Render the view with the orders data
+        res.render('staffHistorialOrder', { orders: orders });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).send('Error fetching orders');
+    }
 });
 
 app.get('/staffOrderModification', (req, res) => {

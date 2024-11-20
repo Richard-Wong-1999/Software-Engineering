@@ -4,7 +4,7 @@
     <title>Order History</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-    	* {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -172,11 +172,13 @@
                 flex-direction: column;
             }
         }
+
         .nav-bar {
             background-color: #2c3e50;
             padding: 15px 20px;
             display: flex;
             justify-content: center;
+            margin-bottom: 20px;
         }
 
         .nav-items {
@@ -216,146 +218,168 @@
             }
         }
         
-        .content{
+        .content {
             width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
-
     </style>
 </head>
 <body>
     <nav class="nav-bar">
         <div class="nav-items">
-            <a href="/menu" class="nav-link">Menu Management</a>
-            <a href="/orders" class="nav-link">Order Modification</a>
-            <a href="/payment" class="nav-link">Payment System</a>
-            <a href="/history" class="nav-link">Historical Orders</a>
-            <a href="/logout" class="nav-link">Sign Out</a>
+            <a href="/menuManagement" class="nav-link">Menu Management</a>
+            <a href="/staffChooseOrderForModification" class="nav-link">Order Modification</a>
+            <a href="/staffChooseOrderForPayment" class="nav-link">Payment System</a>
+            <a href="/staffHistorialOrder" class="nav-link">Order History</a>
+            <a href="/staffLogin" class="nav-link">Sign Out</a>
         </div>
     </nav>
 
+    <div class="content">
+        <div class="header">
+            <h1>Order History</h1>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Payment Status:</label>
+                <select id="paymentStatus">
+                    <option value="all">All</option>
+                    <option value="paid">Paid</option>
+                    <option value="unpaid">Unpaid</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="orders-container">
+            <% orders.sort((a, b) => b.time - a.time).forEach(order => { %>
+                <div class="order-card" data-order-time="<%= order.time %>">
+                    <div class="order-header">
+                        <div>
+                            <strong>Order Time:</strong> 
+                            <%= new Date(order.time).toLocaleString() %>
+                        </div>
+                        <span class="status-badge payment-<%= order.paymentStatus %>">
+                            <%= order.paymentStatus.toUpperCase() %>
+                        </span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <div class="info-label">Order ID</div>
+                        <div class="info-value"><%= order._id %></div>
+                    </div><br>
+
+                    <div class="order-info">
+                        <div class="info-item">
+                            <div class="info-label">Seat</div>
+                            <div class="info-value"><%= order.seat %></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Number of People</div>
+                            <div class="info-value"><%= order.numberOfPeople %></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Items Count</div>
+                            <div class="info-value"><%= order.items.length %></div>
+                        </div>
+                    </div>
+
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% let totalPrice = 0; %>
+                            <% order.items.forEach(item => { %>
+                                <% totalPrice += item.price * item.quantity; %>
+                                <tr>
+                                    <td><%= item.name %></td>
+                                    <td><%= item.quantity %></td>
+                                    <td>$<%= item.price.toFixed(2) %></td>
+                                    <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                                    <td>
+                                        <span class="status-badge status-<%= item.status %>">
+                                            <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+
+                    <div class="total-price">
+                        Total Price: $<%= totalPrice.toFixed(2) %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+
     <script>
-        // 處理當前頁面的活動狀態
+        // Handle active nav link
         const currentPath = window.location.pathname;
         document.querySelectorAll('.nav-link').forEach(link => {
             if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active');
             }
         });
-    </script>
-    <div class="content">
-    <div class="header">
-        <h1>Order History</h1>
-    </div>
 
-    <div class="filters">
-        <div class="filter-group">
-            <label>Date Range:</label>
-            <input type="date" id="startDate">
-            <span>to</span>
-            <input type="date" id="endDate">
-        </div>
-        <div class="filter-group">
-            <label>Payment Status:</label>
-            <select id="paymentStatus">
-                <option value="all">All</option>
-                <option value="paid">Paid</option>
-                <option value="unpaid">Unpaid</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="orders-container">
-        <% orders.sort((a, b) => b.time - a.time).forEach(order => { %>
-            <div class="order-card">
-                <div class="order-header">
-                    <div>
-                        <strong>Order Time:</strong> 
-                        <%= new Date(order.time).toLocaleString() %>
-                    </div>
-                    <span class="status-badge payment-<%= order.paymentStatus %>">
-                        <%= order.paymentStatus.toUpperCase() %>
-                    </span>
-                </div>
-
-                <div class="order-info">
-                    <div class="info-item">
-                        <div class="info-label">Seat</div>
-                        <div class="info-value"><%= order.seat %></div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Number of People</div>
-                        <div class="info-value"><%= order.numberOfPeople %></div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Items Count</div>
-                        <div class="info-value"><%= order.items.length %></div>
-                    </div>
-                </div>
-
-                <table class="items-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Quantity</th>
-                            <th>Price</th>
-                            <th>Subtotal</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% let totalPrice = 0; %>
-                        <% order.items.forEach(item => { %>
-                            <% totalPrice += item.price * item.quantity; %>
-                            <tr>
-                                <td><%= item.name %></td>
-                                <td><%= item.quantity %></td>
-                                <td>$<%= item.price.toFixed(2) %></td>
-                                <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
-                                <td>
-                                    <span class="status-badge status-<%= item.status %>">
-                                        <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
-                                    </span>
-                                </td>
-                            </tr>
-                        <% }); %>
-                    </tbody>
-                </table>
-
-                <div class="total-price">
-                    Total Price: $<%= totalPrice.toFixed(2) %>
-                </div>
-            </div>
-        <% }); %>
-    </div>
-    </div>
-    <script>
-        // 日期過濾功能
+        // Enhanced date filtering functionality
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
         const paymentStatusSelect = document.getElementById('paymentStatus');
         const orderCards = document.querySelectorAll('.order-card');
 
         function filterOrders() {
-            const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
-            const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
-            const paymentStatus = paymentStatusSelect.value;
+            const startDate = startDateInput.value ? new Date(startDateInput.value).getTime() : null;
+            const endDate = endDateInput.value ? new Date(endDateInput.value).getTime() : null;
+            const paymentStatus = paymentStatusSelect.value.toLowerCase();
 
             orderCards.forEach(card => {
-                const orderDate = new Date(card.querySelector('.order-header').textContent.split('Order Time:')[1].trim());
-                const cardPaymentStatus = card.querySelector('.payment-paid, .payment-unpaid').textContent.toLowerCase();
+                const orderTime = parseInt(card.dataset.orderTime);
+                const cardPaymentStatus = card.querySelector('.payment-paid, .payment-unpaid')
+                    .textContent.trim().toLowerCase();
 
                 let showCard = true;
 
-                if (startDate && orderDate < startDate) showCard = false;
-                if (endDate && orderDate > endDate) showCard = false;
+                // Date filtering
+                if (startDate && orderTime < startDate) showCard = false;
+                if (endDate && orderTime > endDate) showCard = false;
+
+                // Payment status filtering
                 if (paymentStatus !== 'all' && cardPaymentStatus !== paymentStatus) showCard = false;
 
                 card.style.display = showCard ? 'block' : 'none';
             });
         }
 
+        // Set default date range (last 7 days)
+        function setDefaultDateRange() {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(start.getDate() - 7);
+
+            // Format dates for datetime-local input
+            function formatDateTime(date) {
+                return date.toISOString().slice(0, 16);
+            }
+
+            startDateInput.value = formatDateTime(start);
+            endDateInput.value = formatDateTime(end);
+        }
+
+        // Initialize
+        setDefaultDateRange();
+        filterOrders();
+
+        // Add event listeners
         startDateInput.addEventListener('change', filterOrders);
         endDateInput.addEventListener('change', filterOrders);
         paymentStatusSelect.addEventListener('change', filterOrders);
