@@ -66,16 +66,21 @@ app.get('/customerOrder', async (req, res) => {
     try {
         const orderId = req.query.orderId;
         
-        // 獲取訂單信息
+        // Get order information
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).send('Order not found');
         }
 
-        // 從數據庫獲取所有菜單項目
+        // Check if the order is paid
+        if (order.paymentStatus === 'paid') {
+            return res.redirect('/customerPaymentSuccessful');
+        }
+
+        // Get all menu items from database
         const menuItems = await Menu.find({});
         
-        // 將訂單ID和菜單項目傳遞給模板
+        // Pass order ID and menu items to template
         res.render('customerOrder', { 
             orderId: orderId,
             menuItems: menuItems
@@ -155,6 +160,11 @@ app.get('/customerViewOrder', async (req, res) => {
         if (!order) {
             return res.status(404).send('Order not found');
         }
+
+        // Check if the order is paid
+        if (order.paymentStatus === 'paid') {
+            return res.redirect('/customerPaymentSuccessful');
+        }
         
         res.render('customerViewOrder', { order: order });
     } catch (error) {
@@ -163,11 +173,9 @@ app.get('/customerViewOrder', async (req, res) => {
     }
 });
 //------------------------------------------------------------
-
 app.get('/customerPaymentSuccessful', (req, res) => {
     res.render('customerPaymentSuccessful');
 });
-
 // 員工相關路由
 app.get('/staffLogin', (req, res) => {
     res.render('staffLogin');
