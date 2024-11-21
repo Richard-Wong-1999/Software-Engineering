@@ -195,6 +195,62 @@ app.get('/staffChooseOrderForModification', async (req, res) => {
     }
 });
 
+// Update item status
+app.post('/updateItemStatus', async (req, res) => {
+    try {
+        const { orderId, itemIndex, newStatus } = req.body;
+        const order = await Order.findById(orderId);
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+
+        order.items[itemIndex].status = newStatus;
+        await order.save();
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating item status:', error);
+        res.status(500).json({ error: 'Failed to update status' });
+    }
+});
+
+// Delete order item
+app.post('/deleteOrderItem', async (req, res) => {
+    try {
+        const { orderId, itemIndex } = req.body;
+        const order = await Order.findById(orderId);
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+
+        order.items.splice(itemIndex, 1);
+        await order.save();
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting item:', error);
+        res.status(500).json({ error: 'Failed to delete item' });
+    }
+});
+
+// Add new item to order
+app.post('/addOrderItem', async (req, res) => {
+    try {
+        const { orderId, name, quantity, price } = req.body;
+        const order = await Order.findById(orderId);
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+
+        order.items.push({
+            name,
+            quantity,
+            price,
+            status: 'preparing'
+        });
+        await order.save();
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error adding item:', error);
+        res.status(500).json({ error: 'Failed to add item' });
+    }
+});
+
 app.get('/staffHistorialOrder', async (req, res) => {
     try {
         // Fetch all orders from the database
