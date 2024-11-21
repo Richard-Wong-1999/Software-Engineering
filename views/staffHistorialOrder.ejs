@@ -323,66 +323,35 @@
     </div>
 
     <script>
-        // Handle active nav link
-        const currentPath = window.location.pathname;
-        document.querySelectorAll('.nav-link').forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
-                link.classList.add('active');
+    // Handle active nav link
+    const currentPath = window.location.pathname;
+    document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
+    });
+
+    // Payment status filtering functionality
+    const paymentStatusSelect = document.getElementById('paymentStatus');
+    const orderCards = document.querySelectorAll('.order-card');
+
+    function filterOrders() {
+        const paymentStatus = paymentStatusSelect.value.toLowerCase();
+
+        orderCards.forEach(card => {
+            const cardPaymentStatus = card.querySelector('.payment-paid, .payment-unpaid')
+                .textContent.trim().toLowerCase();
+
+            if (paymentStatus === 'all' || cardPaymentStatus === paymentStatus) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
             }
         });
+    }
 
-        // Enhanced date filtering functionality
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const paymentStatusSelect = document.getElementById('paymentStatus');
-        const orderCards = document.querySelectorAll('.order-card');
-
-        function filterOrders() {
-            const startDate = startDateInput.value ? new Date(startDateInput.value).getTime() : null;
-            const endDate = endDateInput.value ? new Date(endDateInput.value).getTime() : null;
-            const paymentStatus = paymentStatusSelect.value.toLowerCase();
-
-            orderCards.forEach(card => {
-                const orderTime = parseInt(card.dataset.orderTime);
-                const cardPaymentStatus = card.querySelector('.payment-paid, .payment-unpaid')
-                    .textContent.trim().toLowerCase();
-
-                let showCard = true;
-
-                // Date filtering
-                if (startDate && orderTime < startDate) showCard = false;
-                if (endDate && orderTime > endDate) showCard = false;
-
-                // Payment status filtering
-                if (paymentStatus !== 'all' && cardPaymentStatus !== paymentStatus) showCard = false;
-
-                card.style.display = showCard ? 'block' : 'none';
-            });
-        }
-
-        // Set default date range (last 7 days)
-        function setDefaultDateRange() {
-            const end = new Date();
-            const start = new Date();
-            start.setDate(start.getDate() - 7);
-
-            // Format dates for datetime-local input
-            function formatDateTime(date) {
-                return date.toISOString().slice(0, 16);
-            }
-
-            startDateInput.value = formatDateTime(start);
-            endDateInput.value = formatDateTime(end);
-        }
-
-        // Initialize
-        setDefaultDateRange();
-        filterOrders();
-
-        // Add event listeners
-        startDateInput.addEventListener('change', filterOrders);
-        endDateInput.addEventListener('change', filterOrders);
-        paymentStatusSelect.addEventListener('change', filterOrders);
-    </script>
+    // Add event listener
+    paymentStatusSelect.addEventListener('change', filterOrders);
+</script>
 </body>
 </html>
