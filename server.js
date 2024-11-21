@@ -173,12 +173,18 @@ app.get('/staffLogin', (req, res) => {
     res.render('staffLogin');
 });
 
-app.get('/staffChooseOrderForModification', (req, res) => {
-    res.render('staffChooseOrderForModification');
-});
-
-app.get('/staffChooseOrderForPayment', (req, res) => {
-    res.render('staffChooseOrderForPayment');
+app.get('/staffChooseOrderForModification', async (req, res) => {
+    try {
+        // Fetch all orders from the database
+        const orders = await Order.find({})
+            .sort({ time: -1 }); // Sort by time in descending order
+        
+        // Render the view with the orders data
+        res.render('staffChooseOrderForModification', { orders: orders });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).send('Error fetching orders');
+    }
 });
 
 app.get('/staffHistorialOrder', async (req, res) => {
@@ -195,12 +201,42 @@ app.get('/staffHistorialOrder', async (req, res) => {
     }
 });
 
-app.get('/staffOrderModification', (req, res) => {
-    res.render('staffOrderModification');
+app.get('/staffOrderModification', async (req, res) => {
+    try {
+        // Fetch all orders from the database
+        const orders = await Order.find({});
+        res.render('staffOrderModification', { orders: orders });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).send('Error fetching orders');
+    }
 });
 
-app.get('/staffPaymentSystem', (req, res) => {
-    res.render('staffPaymentSystem');
+app.get('/staffPaymentSystem', async (req, res) => {
+    try {
+        // Fetch unpaid orders from the database
+        const orders = await Order.find({ paymentStatus: 'unpaid' });
+        res.render('staffPaymentSystem', { orders: orders });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).send('Error fetching orders');
+    }
+});
+
+// Add this route to handle payment status updates
+app.post('/updatePaymentStatus', async (req, res) => {
+    try {
+        const { orderId, paymentStatus } = req.body;
+        
+        await Order.findByIdAndUpdate(orderId, {
+            paymentStatus: paymentStatus
+        });
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error updating payment status:', error);
+        res.status(500).json({ success: false, error: 'Error updating payment status' });
+    }
 });
 
 // 使用路由模組
