@@ -11,7 +11,7 @@ const app = express();
 const staffRegistrationRoutes = require('./routes/staffRegistration');
 const menuManagementRoutes = require('./routes/menuManagement');
 
-const uri = "mongodb+srv://Richard:W12345ong@cluster0.plr6y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = "mongodb+srv://Name:Password@cluster0.plr6y.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // 更新 MongoDB 連接設置
 mongoose.connect(uri)
